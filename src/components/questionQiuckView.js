@@ -1,73 +1,91 @@
 //Author, topic, amount of answers, tags
 import React from "react";
 
-import { Label } from 'react-bootstrap';
+import { Label, Glyphicon } from 'react-bootstrap';
 import * as he from 'he';
-
-// const QuestionQiuckView = ({name}) => (
- // <div>{`Hi ${name}`}</div>
-// );
-
-//    {
-//      "tags": [
-//        "azure"
-//      ],
-//      "owner": {
-//        "reputation": 709,
-//        "user_id": 2446435,
-//        "user_type": "registered",
-//        "accept_rate": 43,
-//        "profile_image": "https://i.stack.imgur.com/eSKl7.jpg?s=128&g=1",
-//        "display_name": "Devin Gleason Lambert",
-//        "link": "https://stackoverflow.com/users/2446435/devin-gleason-lambert"
-//      },
-//      "is_answered": false,
-//      "view_count": 24,
-//      "answer_count": 0,
-//      "score": 0,
-//      "last_activity_date": 1514476418,
-//      "creation_date": 1514476418,
-//      "question_id": 48010464,
-//      "link": "https://stackoverflow.com/questions/48010464/how-to-methodically-govern-azure-load-balancer-routing-on-a-http-request",
-//      "title": "How to methodically govern Azure Load Balancer routing on a Http request?"
-//    }
-
-function unescapeSingleQuote(str) {
-  return (str || '').replace('&#39;',"'");
-}
 
 class QuestionQiuckView extends React.Component {
     constructor(props) {
         super(props);
-        this.onAuthorClicked = () => this.props.onAuthorClicked(this.props.questionDetails.owner.user_id);
+        
+        if(this.props.onAuthorClicked) {
+            this.onAuthorClicked = () => this.props.onAuthorClicked(this.props.questionDetails.owner.user_id);
+        } else {
+            this.onAuthorClicked = () => {};
+        }
+        
+        if(this.props.onQuestionClicked) {
+            this.onQuestionClicked = () => this.props.onQuestionClicked(this.props.questionDetails.question_id);
+        } else {
+            this.onQuestionClicked = () => {};            
+        }
     }
     
     render() {        
-        let authorStyle = {
+        var authorStyle = {
             fontSize: 12,
-            color: '#6a737c',            
-            cursor: 'pointer'
+            color: '#6a737c'
         };
+        
+        if(this.props.onAuthorClicked){
+            authorStyle.cursor = 'pointer';
+        }
+        
+        var pointerStyle = {
+            cursor: 'pointer',
+            marginRight: '5px'
+        };
+        
+        if(this.props.onQuestionClicked){
+            pointerStyle.cursor = 'pointer';
+        }
         
         let tagStyle = {
             marginRight: '3px'
         };
         
+        if(this.props.onTagClicked){
+            tagStyle.cursor = 'pointer';
+        }
+        
         let questionDetails = this.props.questionDetails;
         
         let tags = questionDetails.tags &&
-            questionDetails.tags.map((tag, index) => (
-                <Label bsStyle="info" style={tagStyle} key={index}>{tag}</Label>
-            ));
+            questionDetails.tags.map((tag, index) => {
+                if(this.props.onTagClicked) {
+                    let onTagClicked = () => this.props.onTagClicked(tag);
+                    return (
+                        <Label bsStyle="info" style={tagStyle} key={index} onClick={onTagClicked}>{tag}</Label>
+                    );
+                } else {
+                    return (
+                        <Label bsStyle="info" style={tagStyle} key={index}>{tag}</Label>
+                    );
+                }                
+            });
+            
+        let body = questionDetails.body &&
+            (<div dangerouslySetInnerHTML={{__html: questionDetails.body}} />
+            );
         
         return (
-            <div key={this.props.key}>
+            <div>
                 <div style={authorStyle} onClick={this.onAuthorClicked}> 
                     {he.decode(questionDetails.owner.display_name)} 
                 </div>
-                <h4> {he.decode(questionDetails.title)} </h4>
+                <div>
+                    <h4 style={pointerStyle} onClick={this.onQuestionClicked}> {he.decode(questionDetails.title)} </h4>
+                </div>
+                <div>
+                    {body}
+                </div>
                 <div> 
-                    <b>{questionDetails.answer_count}</b> answer(s)
+                    <span style={pointerStyle} onClick={this.onQuestionClicked}> 
+                        <b>{questionDetails.answer_count}</b> answer(s)
+                    </span>
+                    <a href={questionDetails.link} target="_blank">
+                        <Glyphicon glyph="link"/>
+                    </a>
                 </div>
                 <div> 
                     {tags}

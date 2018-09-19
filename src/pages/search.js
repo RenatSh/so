@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, FormGroup, ControlLabel, FormControl, Col } from 'react-bootstrap';
+import { Button, Form, FormGroup, ControlLabel, FormControl, Col, Grid } from 'react-bootstrap';
 
 export default class SearchPage extends React.Component {
   constructor(props) {
@@ -15,18 +15,16 @@ export default class SearchPage extends React.Component {
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.searchString);
     this.props.history.push({
       pathname: '/results',
       search: '?searchString=' + this.state.searchString
-      // state: { detail: response.data }
     });
     event.preventDefault();
   }
 
   render() {
     return (
-    <Col md={12}>
+    <Grid>
       <Form horizontal onSubmit={this.handleSubmit}>
         <FormGroup>
             <Col componentClass={ControlLabel} sm={2}>
@@ -42,7 +40,7 @@ export default class SearchPage extends React.Component {
             </Col>
         </FormGroup>
       </Form>
-    </Col>
+    </Grid>
     );
   }    
 }
